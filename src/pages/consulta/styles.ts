@@ -22,6 +22,10 @@ export const FormContainer = styled.form`
     font-weight: 600;
   }
 
+  > hr {
+    width: 100%;
+  }
+
   /* Estilos para telas menores que 1100px de largura */
   @media only screen and (max-width: 1100px) {
     width: 70%;
@@ -92,4 +96,44 @@ export const ButtonRemoveSelect = styled.button`
   color: var(--bg-red);
   cursor: pointer;
   border-radius: 50%;
+`;
+
+export const CheckinFormContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--gray-100);
+
+  > div {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+
+    > .observation {
+      font-size: 8px;
+    }
+  }
+
+  > section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    > span {
+      font-size: 24px;
+      color: var(--black);
+      font-weight: 600;
+    }
+  }
+
+  /* Estilos para telas menores que 720px de largura */
+  /* @media only screen and (max-width: 720px) {
+    flex-direction: column;
+  } */
 `;

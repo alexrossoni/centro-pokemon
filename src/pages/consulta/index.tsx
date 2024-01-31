@@ -3,6 +3,7 @@ import {
   FormContainer,
   InputsContainer,
   RegisterYourTeamContainer,
+  CheckinFormContainer,
 } from "./styles";
 import { SubHeader } from "../../components/SubHeader";
 import Head from "next/head";
@@ -208,9 +209,58 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               placeholder="Selecione um horário"
             />
           </InputsContainer>
-          <Button $isAddPokemon={false} disabled={false} type="submit">
-            Concluir Agendamento
-          </Button>
+          <hr />
+          <CheckinFormContainer>
+            <div>
+              <span>Número de pokémons a serem atendidos:</span>
+              <span>{selectsPokemons.length}</span>
+            </div>
+            <div>
+              <span>Atendimento unitário por pokémon:</span>
+              <span>R$ 70,00</span>
+            </div>
+            <div>
+              <span>Subtotal:</span>
+              <span>
+                R${" "}
+                {(selectsPokemons.length * 70).toLocaleString("pt-BR", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+            </div>
+            <div>
+              <span>Taxa geracional*:</span>
+              <span>
+                R${" "}
+                {(selectsPokemons.length * 70 * 0.03).toLocaleString("pt-BR", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+            </div>
+            <div>
+              <span className="observation">
+                *adicionamos uma taxa de 3%, multiplicado pelo número da geração
+                mais alta do time, com limite de até 30%
+              </span>
+            </div>
+            <section className="submitSection">
+              <span>
+                Valor Total:{" "}
+                {(
+                  selectsPokemons.length * 70 +
+                  selectsPokemons.length * 70 * 0.03
+                ).toLocaleString("pt-BR", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+              <Button $isAddPokemon={false} disabled={false} type="submit">
+                Concluir Agendamento
+              </Button>
+            </section>
+          </CheckinFormContainer>
         </FormContainer>
       </Container>
     </>
