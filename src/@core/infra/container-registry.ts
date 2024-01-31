@@ -9,6 +9,8 @@ import { DateHttpGateway } from "./gateways/date-http.gateway";
 import { ListDatesUseCase } from "../application/date/list-dates.use-case";
 import { TimeHttpGateway } from "./gateways/time-http.gateway";
 import { ListTimesUseCase } from "../application/time/list-times.use-case";
+import { CityHttpGateway } from "./gateways/city-http.gateway";
+import { ListCitiesUseCase } from "../application/city/list-cities.use-case";
 
 export const Registry = {
   AxiosAdapter: Symbol.for("AxiosAdapter"),
@@ -16,12 +18,14 @@ export const Registry = {
 
   PokemonGateway: Symbol.for("PokemonGateway"),
   RegionGateway: Symbol.for("RegionGateway"),
+  CityGateway: Symbol.for("CityGateway"),
   DateGateway: Symbol.for("DateGateway"),
   TimeGateway: Symbol.for("TimeGateway"),
 
   ListPokemonsUseCase: Symbol.for("ListPokemonsUseCase"),
   GetPokemonUseCase: Symbol.for("GetPokemonUseCase"),
   ListRegionsUseCase: Symbol.for("ListRegionsUseCase"),
+  ListCitiesUseCase: Symbol.for("ListCitiesUseCase"),
   ListDatesUseCase: Symbol.for("ListDatesUseCase"),
   ListTimesUseCase: Symbol.for("ListTimesUseCase"),
 };
@@ -38,6 +42,9 @@ container.bind(Registry.PokemonGateway).toDynamicValue((context) => {
 });
 container.bind(Registry.RegionGateway).toDynamicValue((context) => {
   return new RegionHttpGateway(context.container.get(Registry.AxiosAdapter));
+});
+container.bind(Registry.CityGateway).toDynamicValue((context) => {
+  return new CityHttpGateway(context.container.get(Registry.AxiosAdapter));
 });
 container.bind(Registry.DateGateway).toDynamicValue((context) => {
   return new DateHttpGateway(
@@ -61,6 +68,9 @@ container.bind(Registry.GetPokemonUseCase).toDynamicValue((context) => {
 });
 container.bind(Registry.ListRegionsUseCase).toDynamicValue((context) => {
   return new ListRegionsUseCase(context.container.get(Registry.RegionGateway));
+});
+container.bind(Registry.ListCitiesUseCase).toDynamicValue((context) => {
+  return new ListCitiesUseCase(context.container.get(Registry.CityGateway));
 });
 container.bind(Registry.ListDatesUseCase).toDynamicValue((context) => {
   return new ListDatesUseCase(context.container.get(Registry.DateGateway));

@@ -19,6 +19,7 @@ import { RegionProps } from "../../@core/domain/entities/region";
 import { ChangeEvent, useEffect, useState } from "react";
 import { ListDatesUseCase } from "../../@core/application/date/list-dates.use-case";
 import { ListTimesUseCase } from "../../@core/application/time/list-times.use-case";
+import { ListCitiesUseCase } from "../../@core/application/city/list-cities.use-case";
 
 type ConsultaProps = {
   pokemons: PokemonProps[];
@@ -85,29 +86,22 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
       event.target.value.slice(1).toLowerCase();
     selectedValue = selectedValue.replaceAll(" ", "-");
 
-    try {
-      const response = await fetch(
-        `https://pokeapi.co/api/v2/region/${selectedValue}`
-      );
-      if (!response.ok) {
-        throw new Error("Erro ao obter cidades da região");
-      }
+    const useCaseListCities = container.get<ListCitiesUseCase>(
+      Registry.ListCitiesUseCase
+    );
 
-      const data = await response.json();
+    const data = await useCaseListCities.execute(selectedValue);
 
-      // Removendo cidades duplicadas usando um Set (coleção de valores únicos)
-      const uniqueCities = new Set<string>(
-        data.locations
-          .map((location: { name: string }) => location.name)
-          .map((formattedCityName: string) => formatCityName(formattedCityName))
-      );
+    // Removendo cidades duplicadas usando um Set (coleção de valores únicos)
+    const uniqueCities = new Set<string>(
+      data
+        .map((location: { name: string }) => location.name)
+        .map((formattedCityName: string) => formatCityName(formattedCityName))
+    );
 
-      const uniqueCitiesArray: string[] = Array.from(uniqueCities);
+    const uniqueCitiesArray: string[] = Array.from(uniqueCities);
 
-      setCities(uniqueCitiesArray);
-    } catch (error) {
-      console.error(error);
-    }
+    setCities(uniqueCitiesArray);
   };
 
   // Função para formatar o nome da cidade
