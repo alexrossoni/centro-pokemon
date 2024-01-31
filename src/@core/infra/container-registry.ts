@@ -2,25 +2,35 @@ import { Container } from "inversify";
 import { GetPokemonUseCase } from "../application/pokemon/get-pokemon.use-case";
 import { ListPokemonsUseCase } from "../application/pokemon/list-pokemons.use-case";
 import { PokemonHttpGateway } from "./gateways/pokemon-http.gateway";
-import { http } from "./http";
+import { http, scheduling } from "./http";
 import { RegionHttpGateway } from "./gateways/region-http.gateway";
 import { ListRegionsUseCase } from "../application/region/list-regions.use-case";
+import { DateHttpGateway } from "./gateways/date-http.gateway";
+import { ListDatesUseCase } from "../application/date/list-dates.use-case";
+import { TimeHttpGateway } from "./gateways/time-http.gateway";
+import { ListTimesUseCase } from "../application/time/list-times.use-case";
 
 export const Registry = {
   AxiosAdapter: Symbol.for("AxiosAdapter"),
+  AxiosAdapterScheduling: Symbol.for("AxiosAdapterScheduling"),
 
   PokemonGateway: Symbol.for("PokemonGateway"),
   RegionGateway: Symbol.for("RegionGateway"),
+  DateGateway: Symbol.for("DateGateway"),
+  TimeGateway: Symbol.for("TimeGateway"),
 
   ListPokemonsUseCase: Symbol.for("ListPokemonsUseCase"),
   GetPokemonUseCase: Symbol.for("GetPokemonUseCase"),
   ListRegionsUseCase: Symbol.for("ListRegionsUseCase"),
+  ListDatesUseCase: Symbol.for("ListDatesUseCase"),
+  ListTimesUseCase: Symbol.for("ListTimesUseCase"),
 };
 
 export const container = new Container();
 
 //########## HTTP
 container.bind(Registry.AxiosAdapter).toConstantValue(http);
+container.bind(Registry.AxiosAdapterScheduling).toConstantValue(scheduling);
 
 //########## GATEWAYS
 container.bind(Registry.PokemonGateway).toDynamicValue((context) => {
@@ -28,6 +38,16 @@ container.bind(Registry.PokemonGateway).toDynamicValue((context) => {
 });
 container.bind(Registry.RegionGateway).toDynamicValue((context) => {
   return new RegionHttpGateway(context.container.get(Registry.AxiosAdapter));
+});
+container.bind(Registry.DateGateway).toDynamicValue((context) => {
+  return new DateHttpGateway(
+    context.container.get(Registry.AxiosAdapterScheduling)
+  );
+});
+container.bind(Registry.TimeGateway).toDynamicValue((context) => {
+  return new TimeHttpGateway(
+    context.container.get(Registry.AxiosAdapterScheduling)
+  );
 });
 
 //########## USE CASES
@@ -41,4 +61,10 @@ container.bind(Registry.GetPokemonUseCase).toDynamicValue((context) => {
 });
 container.bind(Registry.ListRegionsUseCase).toDynamicValue((context) => {
   return new ListRegionsUseCase(context.container.get(Registry.RegionGateway));
+});
+container.bind(Registry.ListDatesUseCase).toDynamicValue((context) => {
+  return new ListDatesUseCase(context.container.get(Registry.DateGateway));
+});
+container.bind(Registry.ListTimesUseCase).toDynamicValue((context) => {
+  return new ListTimesUseCase(context.container.get(Registry.TimeGateway));
 });

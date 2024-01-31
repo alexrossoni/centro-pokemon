@@ -17,6 +17,8 @@ import { PokemonProps } from "../../@core/domain/entities/pokemon";
 import { ListRegionsUseCase } from "../../@core/application/region/list-regions.use-case";
 import { RegionProps } from "../../@core/domain/entities/region";
 import { ChangeEvent, useEffect, useState } from "react";
+import { ListDatesUseCase } from "../../@core/application/date/list-dates.use-case";
+import { ListTimesUseCase } from "../../@core/application/time/list-times.use-case";
 
 type ConsultaProps = {
   pokemons: PokemonProps[];
@@ -50,48 +52,26 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
     );
   };
 
-  // Obtendo horários disponíveis ao inicializar
+  // Obtendo datas e horários disponíveis ao inicializar
   useEffect(() => {
-    fetch("/api/scheduling/time", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Erro ao obter os horários");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setAvailableTimes(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
+    const useCaseListDates = container.get<ListDatesUseCase>(
+      Registry.ListDatesUseCase
+    );
+    const useCaseListTimes = container.get<ListTimesUseCase>(
+      Registry.ListTimesUseCase
+    );
 
-  // Obtendo datas disponíveis ao inicializar
-  useEffect(() => {
-    fetch("/api/scheduling/date", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Erro ao obter as datas");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setAvailableDates(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const fetchData = async () => {
+      const [dates, times] = await Promise.all([
+        useCaseListDates.execute(),
+        useCaseListTimes.execute(),
+      ]);
+
+      setAvailableDates(dates);
+      setAvailableTimes(times);
+    };
+
+    fetchData();
   }, []);
 
   const handleRegionChange = async (event: ChangeEvent<HTMLSelectElement>) => {
