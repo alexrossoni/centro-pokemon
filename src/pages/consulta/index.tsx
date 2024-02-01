@@ -21,6 +21,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { ListDatesUseCase } from "../../@core/application/date/list-dates.use-case";
 import { ListTimesUseCase } from "../../@core/application/time/list-times.use-case";
 import { ListCitiesUseCase } from "../../@core/application/city/list-cities.use-case";
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 
 type ConsultaProps = {
   pokemons: PokemonProps[];
@@ -28,31 +29,9 @@ type ConsultaProps = {
 };
 
 function Consulta({ pokemons, regions }: ConsultaProps) {
-  const [selectsPokemons, setSelectsPokemons] = useState<{ id: number }[]>([
-    { id: 1 },
-  ]); // Inicializando com um select de pokémons
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
-
-  const addPokemonSelect = () => {
-    event?.preventDefault();
-    if (selectsPokemons.length < 6) {
-      setSelectsPokemons((prevPokemons) => [
-        ...prevPokemons,
-        { id: Date.now() },
-      ]);
-    }
-  };
-
-  const removePokemonSelect = (id: number) => {
-    event?.preventDefault();
-    setSelectsPokemons((prevPokemons) =>
-      prevPokemons.length > 1
-        ? prevPokemons.filter((pokemon) => pokemon.id !== id)
-        : [{ id: 1 }]
-    );
-  };
 
   // Obtendo datas e horários disponíveis ao inicializar
   useEffect(() => {
@@ -105,7 +84,7 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
     setCities(uniqueCitiesArray);
   };
 
-  // Função para formatar o nome da cidade
+  // Função para formatar o nome das cidades
   const formatCityName = (cityName: string): string => {
     const formattedName = cityName
       .replaceAll("-", " ")
@@ -113,15 +92,40 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
     return formattedName;
   };
 
-  const pokemonsNames: string[] = pokemons.map(
-    (item) =>
-      item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase()
-  );
+  const pokemonsNames: { name: string }[] = pokemons.map(({ name }) => ({
+    name: name.charAt(0).toUpperCase() + name.slice(1).toLowerCase(),
+  }));
 
   const regionsNames: string[] = regions.map(
     (item) =>
       item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase()
   );
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      surname: "",
+      region: "",
+      city: "",
+      date: "",
+      time: "",
+      pokemonsValues: [{ name: "Bulbasaur" }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "pokemonsValues",
+  });
+
+  const onSubmit: SubmitHandler<any> = (data: any) => {
+    console.log(data);
+  };
 
   return (
     <>
@@ -133,7 +137,7 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
           description="Recupere seus pokémons em 5 segundos."
           page="Agendar Consulta"
         />
-        <FormContainer>
+        <FormContainer onSubmit={handleSubmit(onSubmit)}>
           <h1>Preencha o formulário abaixo para agendar sua consulta</h1>
           <InputsContainer>
             <Input
@@ -141,12 +145,14 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               typeInput="text"
               placeholder="Digite seu nome"
               labelText="Nome"
+              {...register("name")}
             />
             <Input
               idInput="surname"
               typeInput="text"
               placeholder="Digite seu sobrenome"
               labelText="Sobrenome"
+              {...register("surname")}
             />
           </InputsContainer>
           <InputsContainer>
@@ -155,8 +161,9 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               labelText="Região"
               $isSelectPokemon={false}
               options={regionsNames}
-              onChange={handleRegionChange}
               placeholder="Selecione uma região"
+              {...register("region")}
+              onChange={handleRegionChange}
             />
             <Select
               idSelect="city"
@@ -164,6 +171,7 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               $isSelectPokemon={false}
               options={cities}
               disabled={!cities.length}
+              {...register("city")}
             />
           </InputsContainer>
           <RegisterYourTeamContainer>
@@ -171,23 +179,25 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               <h2>Cadastre seu time</h2>
               <span>Atendemos até 06 pokémons por vez</span>
             </div>
-            {selectsPokemons.map((select, index) => (
-              <div key={select.id} className="registerYourTeamSessionPokemons">
+            {fields.map((field, index) => (
+              <div key={field.id} className="registerYourTeamSessionPokemons">
                 <Select
-                  idSelect={`pokemon${select.id}`}
                   labelText={`Pokémon ${index + 1}`}
                   $isSelectPokemon={true}
                   options={pokemonsNames}
+                  {...register(`pokemonsValues.${index}.name`)}
+                  key={field.id}
                 />
-                {index > 0 && (
-                  <FaTrash onClick={() => removePokemonSelect(select.id)} />
-                )}
+                {index > 0 && <FaTrash onClick={() => remove(index)} />}
               </div>
             ))}
             <Button
               $isAddPokemon={true}
-              disabled={selectsPokemons.length == 6}
-              onClick={addPokemonSelect}
+              disabled={fields.length == 6}
+              onClick={() => {
+                event?.preventDefault();
+                append({ name: "Bulbasaur" });
+              }}
             >
               Adicionar novo pokémon ao time...
               <FaPlus size={10} />
@@ -200,6 +210,7 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               $isSelectPokemon={false}
               options={availableDates}
               placeholder="Selecione uma data"
+              {...register("date")}
             />
             <Select
               idSelect="time"
@@ -207,13 +218,14 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               $isSelectPokemon={false}
               options={availableTimes}
               placeholder="Selecione um horário"
+              {...register("time")}
             />
           </InputsContainer>
           <hr />
           <CheckinFormContainer>
             <div>
               <span>Número de pokémons a serem atendidos:</span>
-              <span>{selectsPokemons.length}</span>
+              <span>{fields.length}</span>
             </div>
             <div>
               <span>Atendimento unitário por pokémon:</span>
@@ -223,7 +235,7 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               <span>Subtotal:</span>
               <span>
                 R${" "}
-                {(selectsPokemons.length * 70).toLocaleString("pt-BR", {
+                {(fields.length * 70).toLocaleString("pt-BR", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
@@ -233,7 +245,7 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               <span>Taxa geracional*:</span>
               <span>
                 R${" "}
-                {(selectsPokemons.length * 70 * 0.03).toLocaleString("pt-BR", {
+                {(fields.length * 70 * 0.03).toLocaleString("pt-BR", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
@@ -249,8 +261,8 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               <span>
                 Valor Total:{" "}
                 {(
-                  selectsPokemons.length * 70 +
-                  selectsPokemons.length * 70 * 0.03
+                  fields.length * 70 +
+                  fields.length * 70 * 0.03
                 ).toLocaleString("pt-BR", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,

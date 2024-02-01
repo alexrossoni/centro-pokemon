@@ -1,3 +1,5 @@
+import { InputHTMLAttributes, SelectHTMLAttributes } from "react";
+
 export interface IMainButtonHeader {
   $expanded: boolean;
   sourceImage: string;
@@ -5,18 +7,18 @@ export interface IMainButtonHeader {
   btnText: string;
 }
 
-export interface IInput {
+export interface IInput extends InputHTMLAttributes<HTMLInputElement> {
   labelText: string;
   idInput: string;
   typeInput: string;
   placeholder: string;
 }
 
-export interface ISelect {
+export interface ISelect extends SelectHTMLAttributes<HTMLSelectElement> {
   labelText: string;
-  idSelect: string;
+  idSelect?: string;
   $isSelectPokemon: boolean;
-  options: string[];
+  options?: string[] | { name: string }[];
   placeholder?: string;
   disabled?: boolean;
   onChange?: any;
