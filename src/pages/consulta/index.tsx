@@ -23,6 +23,23 @@ import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Error } from "../../components/Error";
 import { IConsultaProps } from "../../interfaces/pages";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup
+  .object({
+    name: yup.string().required(),
+    surname: yup.string().required(),
+    region: yup.string().required(),
+    city: yup.string().required(),
+    pokemonsValues: yup.array<{ name: string }>().required(),
+    date: yup.string().required(),
+    time: yup.string().required(),
+    quantity: yup.number().positive().integer(),
+    tax: yup.number(),
+    price: yup.number(),
+  })
+  .required();
 
 function Consulta({ pokemons, regions, error }: IConsultaProps) {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
@@ -66,18 +83,24 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
     register,
     handleSubmit,
     control,
+    setValue,
+    getValues,
+    watch,
     formState: { errors },
   } = useForm({
+    resolver: yupResolver(schema),
     defaultValues: {
       name: "",
       surname: "",
       region: "",
       city: "",
+      pokemonsValues: [{ name: "Bulbasaur" }],
       date: "",
       time: "",
-      pokemonsValues: [{ name: "Bulbasaur" }],
     },
   });
+
+  const pokemonsValuesWatch = watch("pokemonsValues");
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -87,6 +110,25 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
   const onSubmit: SubmitHandler<any> = (data: any) => {
     console.log(data);
   };
+
+  useEffect(() => {
+    const values = getValues();
+
+    const quantityValue = values.pokemonsValues.length;
+    setValue("quantity", quantityValue);
+
+    const subTotal = quantityValue * 70;
+    const maxTaxValue = subTotal * 0.3;
+
+    // const highestGen = Math.max(...values.pokemonsValues.map((pokemon) => pokemon.gen));
+    const highestGen = 1;
+    // Garante que taxValue não ultrapasse 30% do subTotal
+    const taxValue = Math.min(subTotal * 0.03 * highestGen, maxTaxValue);
+    setValue("tax", taxValue);
+
+    const priceValue = subTotal + taxValue;
+    setValue("price", priceValue);
+  }, [setValue, getValues, pokemonsValuesWatch]);
 
   // Renderização condicional do componente Error em caso de erro ao buscar dados da API
   if (error) {
