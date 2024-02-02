@@ -11,6 +11,8 @@ import { TimeHttpGateway } from "./gateways/time-http.gateway";
 import { ListTimesUseCase } from "../application/time/list-times.use-case";
 import { CityHttpGateway } from "./gateways/city-http.gateway";
 import { ListCitiesUseCase } from "../application/city/list-cities.use-case";
+import { ScheduleHttpGateway } from "./gateways/schedule-http.gateway";
+import { PostScheduleUseCase } from "../application/schedule/post-schedule.use-case";
 
 export const Registry = {
   AxiosAdapter: Symbol.for("AxiosAdapter"),
@@ -21,6 +23,7 @@ export const Registry = {
   CityGateway: Symbol.for("CityGateway"),
   DateGateway: Symbol.for("DateGateway"),
   TimeGateway: Symbol.for("TimeGateway"),
+  ScheduleGateway: Symbol.for("ScheduleGateway"),
 
   ListPokemonsUseCase: Symbol.for("ListPokemonsUseCase"),
   GetPokemonUseCase: Symbol.for("GetPokemonUseCase"),
@@ -28,6 +31,7 @@ export const Registry = {
   ListCitiesUseCase: Symbol.for("ListCitiesUseCase"),
   ListDatesUseCase: Symbol.for("ListDatesUseCase"),
   ListTimesUseCase: Symbol.for("ListTimesUseCase"),
+  PostScheduleUseCase: Symbol.for("PostScheduleUseCase"),
 };
 
 export const container = new Container();
@@ -56,6 +60,11 @@ container.bind(Registry.TimeGateway).toDynamicValue((context) => {
     context.container.get(Registry.AxiosAdapterScheduling)
   );
 });
+container.bind(Registry.ScheduleGateway).toDynamicValue((context) => {
+  return new ScheduleHttpGateway(
+    context.container.get(Registry.AxiosAdapterScheduling)
+  );
+});
 
 //########## USE CASES
 container.bind(Registry.ListPokemonsUseCase).toDynamicValue((context) => {
@@ -77,4 +86,9 @@ container.bind(Registry.ListDatesUseCase).toDynamicValue((context) => {
 });
 container.bind(Registry.ListTimesUseCase).toDynamicValue((context) => {
   return new ListTimesUseCase(context.container.get(Registry.TimeGateway));
+});
+container.bind(Registry.PostScheduleUseCase).toDynamicValue((context) => {
+  return new PostScheduleUseCase(
+    context.container.get(Registry.ScheduleGateway)
+  );
 });

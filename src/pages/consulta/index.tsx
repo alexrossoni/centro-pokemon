@@ -25,6 +25,7 @@ import { Error } from "../../components/Error";
 import { IConsultaProps } from "../../interfaces/pages";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { PostScheduleUseCase } from "../../@core/application/schedule/post-schedule.use-case";
 
 const schema = yup
   .object({
@@ -111,16 +112,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
 
   const onSubmit: SubmitHandler<any> = (data: any) => {
     if (isValid) {
-      console.log(data);
-      toast.success(
-        "Seu agendamento foi conclúido. Agradecemos sua preferência!",
-        {
-          toastId: "success-submit-form",
-          position: "top-right",
-          theme: "dark",
-        }
-      );
-      reset();
+      postConsulta(data);
     }
   };
 
@@ -225,6 +217,46 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
     (item) =>
       item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase()
   );
+
+  const postConsulta = async (formData: object) => {
+    let resp: any;
+
+    try {
+      const useCasePostAgendamento = container.get<PostScheduleUseCase>(
+        Registry.PostScheduleUseCase
+      );
+
+      resp = await useCasePostAgendamento.execute(formData);
+
+      if (resp.success) {
+        toast.success(
+          "Seu agendamento foi conclúido. Agradecemos sua preferência!",
+          {
+            toastId: "success-submit-form",
+            position: "top-right",
+            theme: "dark",
+          }
+        );
+        reset();
+      }
+    } catch (err) {
+      console.error("Erro ao enviar formulário:", err);
+      toast.error(
+        "Não foi possível concluir seu agendamento. Tente novamente.",
+        {
+          toastId: "error-submit-form",
+          position: "top-right",
+          theme: "dark",
+        }
+      );
+    } finally {
+      if (resp && resp.success) {
+        console.log("Sucesso ao agendar!", resp);
+      } else {
+        console.log("Erro ao agendar!");
+      }
+    }
+  };
 
   return (
     <>
