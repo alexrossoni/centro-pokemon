@@ -4,12 +4,22 @@ import { IInput } from "../../interfaces/components";
 import { DivLabelInput } from "./styles";
 
 export const Input = forwardRef<HTMLInputElement, IInput>(
-  ({ labelText, idInput, typeInput, placeholder, ...props }: IInput, ref) => {
+  (
+    {
+      labelText,
+      idInput,
+      typeInput,
+      placeholder,
+      isRequired,
+      ...props
+    }: IInput,
+    ref
+  ) => {
     return (
       <DivLabelInput>
         <label htmlFor={idInput}>
           {labelText}
-          {props.required && <span style={{ color: "red" }}>*</span>}
+          {isRequired && <span style={{ color: "red" }}>*</span>}
         </label>
         <input
           id={idInput}

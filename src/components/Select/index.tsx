@@ -12,6 +12,7 @@ export const Select = forwardRef(
       options,
       placeholder,
       disabled,
+      isRequired,
       ...props
     }: ISelect,
     ref: Ref<HTMLSelectElement>
@@ -20,7 +21,7 @@ export const Select = forwardRef(
       <DivLabelSelect $isSelectPokemon={$isSelectPokemon}>
         <label htmlFor={idSelect}>
           {labelText}
-          {props.required && <span style={{ color: "red" }}>*</span>}
+          {isRequired && <span style={{ color: "red" }}>*</span>}
         </label>
         <select
           name={labelText}

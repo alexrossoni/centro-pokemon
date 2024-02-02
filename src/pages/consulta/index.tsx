@@ -35,13 +35,13 @@ const schema = yup
     pokemonsValues: yup.array<{ name: string }>().required(),
     date: yup.string().required(),
     time: yup.string().required(),
-    quantity: yup.number().positive().integer(),
-    tax: yup.number(),
-    price: yup.number(),
+    quantity: yup.number().positive().integer().required(),
+    tax: yup.number().required(),
+    price: yup.number().required(),
   })
   .required();
 
-function Consulta({ pokemons, regions, error }: IConsultaProps) {
+function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
@@ -86,7 +86,8 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
     setValue,
     getValues,
     watch,
-    formState: { errors },
+    reset,
+    formState: { errors, isSubmitted, isValid, isSubmitSuccessful },
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -97,10 +98,11 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
       pokemonsValues: [{ name: "Bulbasaur" }],
       date: "",
       time: "",
+      quantity: 1,
+      price: 0,
+      tax: 0,
     },
   });
-
-  const pokemonsValuesWatch = watch("pokemonsValues");
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -108,8 +110,21 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
   });
 
   const onSubmit: SubmitHandler<any> = (data: any) => {
-    console.log(data);
+    if (isValid) {
+      console.log(data);
+      toast.success(
+        "Seu agendamento foi conclúido. Agradecemos sua preferência!",
+        {
+          toastId: "success-submit-form",
+          position: "top-right",
+          theme: "dark",
+        }
+      );
+      reset();
+    }
   };
+
+  const pokemonsValuesWatch = watch("pokemonsValues");
 
   useEffect(() => {
     const values = getValues();
@@ -130,9 +145,23 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
     setValue("price", priceValue);
   }, [setValue, getValues, pokemonsValuesWatch]);
 
+  useEffect(() => {
+    if (!isValid && isSubmitted && !isSubmitSuccessful) {
+      toast.error("Preencha todos os campos obrigatórios para o agendamento.", {
+        toastId: "error-invalid-form",
+        position: "top-right",
+        theme: "dark",
+      });
+    }
+  }, [isValid, isSubmitted, isSubmitSuccessful]);
+
+  const priceValue: number = watch("price");
+  const taxValue: number = watch("tax");
+  const quantityValue: number = watch("quantity");
+
   // Renderização condicional do componente Error em caso de erro ao buscar dados da API
-  if (error) {
-    return <Error error={error} />;
+  if (fetchDataError) {
+    return <Error error={fetchDataError} />;
   }
 
   const handleRegionChange = async (event: ChangeEvent<HTMLSelectElement>) => {
@@ -216,7 +245,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               placeholder="Digite seu nome"
               labelText="Nome"
               {...register("name")}
-              required
+              isRequired={true}
             />
             <Input
               idInput="surname"
@@ -224,7 +253,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               placeholder="Digite seu sobrenome"
               labelText="Sobrenome"
               {...register("surname")}
-              required
+              isRequired={true}
             />
           </InputsContainer>
           <InputsContainer>
@@ -236,7 +265,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               placeholder="Selecione uma região"
               {...register("region")}
               onChange={handleRegionChange}
-              required
+              isRequired={true}
             />
             <Select
               idSelect="city"
@@ -245,7 +274,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               options={cities}
               disabled={!cities.length}
               {...register("city")}
-              required
+              isRequired={true}
             />
           </InputsContainer>
           <RegisterYourTeamContainer>
@@ -261,7 +290,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
                   options={pokemonsNames}
                   {...register(`pokemonsValues.${index}.name`)}
                   key={field.id}
-                  required={index == 0}
+                  isRequired={index == 0}
                 />
                 {index > 0 && <FaTrash onClick={() => remove(index)} />}
               </div>
@@ -287,7 +316,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               placeholder="Selecione uma data"
               {...register("date")}
               disabled={!availableDates}
-              required
+              isRequired={true}
             />
             <Select
               idSelect="time"
@@ -297,14 +326,14 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               placeholder="Selecione um horário"
               {...register("time")}
               disabled={!availableTimes}
-              required
+              isRequired={true}
             />
           </InputsContainer>
           <hr />
           <CheckinFormContainer>
             <div>
               <span>Número de pokémons a serem atendidos:</span>
-              <span>{fields.length}</span>
+              <span>{quantityValue}</span>
             </div>
             <div>
               <span>Atendimento unitário por pokémon:</span>
@@ -314,7 +343,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               <span>Subtotal:</span>
               <span>
                 R${" "}
-                {(fields.length * 70).toLocaleString("pt-BR", {
+                {(quantityValue * 70).toLocaleString("pt-BR", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
@@ -324,7 +353,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               <span>Taxa geracional*:</span>
               <span>
                 R${" "}
-                {(fields.length * 70 * 0.03).toLocaleString("pt-BR", {
+                {taxValue.toLocaleString("pt-BR", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
@@ -339,10 +368,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
             <section className="submitSection">
               <span>
                 Valor Total:{" "}
-                {(
-                  fields.length * 70 +
-                  fields.length * 70 * 0.03
-                ).toLocaleString("pt-BR", {
+                {priceValue.toLocaleString("pt-BR", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
@@ -385,7 +411,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     return {
       props: {
-        error: true,
+        fetchDataError: true,
       },
     };
   }

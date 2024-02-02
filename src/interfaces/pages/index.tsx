@@ -4,5 +4,5 @@ import { RegionProps } from "../../@core/domain/entities/region";
 export interface IConsultaProps {
   pokemons: PokemonProps[];
   regions: RegionProps[];
-  error: boolean;
+  fetchDataError: boolean;
 }

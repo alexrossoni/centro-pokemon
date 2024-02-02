@@ -12,6 +12,7 @@ export interface IInput extends InputHTMLAttributes<HTMLInputElement> {
   idInput: string;
   typeInput: string;
   placeholder: string;
+  isRequired: boolean;
 }
 
 export interface ISelect extends SelectHTMLAttributes<HTMLSelectElement> {
@@ -22,6 +23,7 @@ export interface ISelect extends SelectHTMLAttributes<HTMLSelectElement> {
   placeholder?: string;
   disabled?: boolean;
   onChange?: any;
+  isRequired: boolean;
 }
 
 export interface ISubHeader {
