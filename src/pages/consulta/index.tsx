@@ -22,13 +22,18 @@ import { ListDatesUseCase } from "../../@core/application/date/list-dates.use-ca
 import { ListTimesUseCase } from "../../@core/application/time/list-times.use-case";
 import { ListCitiesUseCase } from "../../@core/application/city/list-cities.use-case";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import errorImage from "../../../public/images/error.png";
+import Image from "next/image";
+import { toast } from "react-toastify";
+import { Error } from "../../components/Error";
 
 type ConsultaProps = {
   pokemons: PokemonProps[];
   regions: RegionProps[];
+  error: boolean;
 };
 
-function Consulta({ pokemons, regions }: ConsultaProps) {
+function Consulta({ pokemons, regions, error }: ConsultaProps) {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
@@ -52,8 +57,46 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
       setAvailableTimes(times);
     };
 
-    fetchData();
+    fetchData().catch((err) => {
+      console.error("Erro ao carregar datas para atendimento:", err);
+
+      toast.error(
+        "Ops! Encontramos um problema ao carregar opções de data e horário para atendimento. Parece que há um pequeno contratempo com nossos servidores. Tente novamente.",
+        {
+          toastId: "error-get-schedules",
+          position: "top-right",
+          theme: "dark",
+        }
+      );
+    });
   }, []);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      surname: "",
+      region: "",
+      city: "",
+      date: "",
+      time: "",
+      pokemonsValues: [{ name: "Bulbasaur" }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "pokemonsValues",
+  });
+
+  // Renderização condicional do componente Error em caso de erro ao buscar dados da API
+  if (error) {
+    return <Error error={error} />;
+  }
 
   const handleRegionChange = async (event: ChangeEvent<HTMLSelectElement>) => {
     if (!event.target.value) {
@@ -70,7 +113,23 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
       Registry.ListCitiesUseCase
     );
 
-    const data = await useCaseListCities.execute(selectedValue);
+    const data = await useCaseListCities.execute(selectedValue).catch((err) => {
+      console.error("Erro ao carregar cidades:", err);
+
+      toast.error(
+        "Ops! Encontramos um problema ao carregar opções de cidades para sua região. Parece que há um pequeno contratempo com nossos servidores. Tente novamente.",
+        {
+          toastId: "error-get-cities",
+          position: "top-right",
+          theme: "dark",
+        }
+      );
+    });
+
+    // Verifica se a lista de cidades foi obtida
+    if (!data) {
+      return;
+    }
 
     // Removendo cidades duplicadas usando um Set (coleção de valores únicos)
     const uniqueCities = new Set<string>(
@@ -100,28 +159,6 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
     (item) =>
       item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase()
   );
-
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      name: "",
-      surname: "",
-      region: "",
-      city: "",
-      date: "",
-      time: "",
-      pokemonsValues: [{ name: "Bulbasaur" }],
-    },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "pokemonsValues",
-  });
 
   const onSubmit: SubmitHandler<any> = (data: any) => {
     console.log(data);
@@ -211,6 +248,7 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               options={availableDates}
               placeholder="Selecione uma data"
               {...register("date")}
+              disabled={!availableDates}
             />
             <Select
               idSelect="time"
@@ -219,6 +257,7 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
               options={availableTimes}
               placeholder="Selecione um horário"
               {...register("time")}
+              disabled={!availableTimes}
             />
           </InputsContainer>
           <hr />
@@ -282,22 +321,32 @@ function Consulta({ pokemons, regions }: ConsultaProps) {
 export default Consulta;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const useCaseListPokemons = container.get<ListPokemonsUseCase>(
-    Registry.ListPokemonsUseCase
-  );
-  const useCaseListRegions = container.get<ListRegionsUseCase>(
-    Registry.ListRegionsUseCase
-  );
+  try {
+    const useCaseListPokemons = container.get<ListPokemonsUseCase>(
+      Registry.ListPokemonsUseCase
+    );
+    const useCaseListRegions = container.get<ListRegionsUseCase>(
+      Registry.ListRegionsUseCase
+    );
 
-  const [pokemons, regions] = await Promise.all([
-    useCaseListPokemons.execute(),
-    useCaseListRegions.execute(),
-  ]);
+    const [pokemons, regions] = await Promise.all([
+      useCaseListPokemons.execute(),
+      useCaseListRegions.execute(),
+    ]);
 
-  return {
-    props: {
-      pokemons: pokemons.map((pokemon) => pokemon.toJSON()),
-      regions: regions.map((region) => region.toJSON()),
-    },
-  };
+    return {
+      props: {
+        pokemons: pokemons.map((pokemon) => pokemon.toJSON()),
+        regions: regions.map((region) => region.toJSON()),
+      },
+    };
+  } catch (error) {
+    console.error("Erro ao carregar dados:", error);
+
+    return {
+      props: {
+        error: true,
+      },
+    };
+  }
 };

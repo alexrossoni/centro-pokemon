@@ -10,7 +10,7 @@ export const Container = styled.div`
 `;
 
 export const TextContainer = styled.div`
-  width: 40%;
+  width: 35%;
   display: flex;
   flex-direction: column;
   padding: 3rem 0;
@@ -28,9 +28,10 @@ export const TextContainer = styled.div`
 
     > p {
       font-size: 14px;
+      /* text-align: justify; */
 
       &:not(:last-child) {
-        margin-bottom: .5rem;
+        margin-bottom: 0.5rem;
       }
     }
   }

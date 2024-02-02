@@ -32,3 +32,7 @@ export interface ISubHeader {
 export interface IButtonAddPokemon {
   $isAddPokemon?: boolean;
 }
+
+export interface IError {
+  error: boolean;
+}
