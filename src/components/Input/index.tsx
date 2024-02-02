@@ -7,7 +7,10 @@ export const Input = forwardRef<HTMLInputElement, IInput>(
   ({ labelText, idInput, typeInput, placeholder, ...props }: IInput, ref) => {
     return (
       <DivLabelInput>
-        <label htmlFor={idInput}>{labelText}</label>
+        <label htmlFor={idInput}>
+          {labelText}
+          {props.required && <span style={{ color: "red" }}>*</span>}
+        </label>
         <input
           id={idInput}
           type={typeInput}

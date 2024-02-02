@@ -174,6 +174,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               placeholder="Digite seu nome"
               labelText="Nome"
               {...register("name")}
+              required
             />
             <Input
               idInput="surname"
@@ -181,6 +182,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               placeholder="Digite seu sobrenome"
               labelText="Sobrenome"
               {...register("surname")}
+              required
             />
           </InputsContainer>
           <InputsContainer>
@@ -192,6 +194,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               placeholder="Selecione uma região"
               {...register("region")}
               onChange={handleRegionChange}
+              required
             />
             <Select
               idSelect="city"
@@ -200,6 +203,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               options={cities}
               disabled={!cities.length}
               {...register("city")}
+              required
             />
           </InputsContainer>
           <RegisterYourTeamContainer>
@@ -215,6 +219,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
                   options={pokemonsNames}
                   {...register(`pokemonsValues.${index}.name`)}
                   key={field.id}
+                  required={index == 0}
                 />
                 {index > 0 && <FaTrash onClick={() => remove(index)} />}
               </div>
@@ -240,6 +245,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               placeholder="Selecione uma data"
               {...register("date")}
               disabled={!availableDates}
+              required
             />
             <Select
               idSelect="time"
@@ -249,6 +255,7 @@ function Consulta({ pokemons, regions, error }: IConsultaProps) {
               placeholder="Selecione um horário"
               {...register("time")}
               disabled={!availableTimes}
+              required
             />
           </InputsContainer>
           <hr />

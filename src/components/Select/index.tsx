@@ -18,7 +18,10 @@ export const Select = forwardRef(
   ) => {
     return (
       <DivLabelSelect $isSelectPokemon={$isSelectPokemon}>
-        <label htmlFor={idSelect}>{labelText}</label>
+        <label htmlFor={idSelect}>
+          {labelText}
+          {props.required && <span style={{ color: "red" }}>*</span>}
+        </label>
         <select
           name={labelText}
           id={idSelect}
