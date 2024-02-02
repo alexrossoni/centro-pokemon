@@ -14,26 +14,17 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 import type { GetServerSideProps } from "next";
 import { ListPokemonsUseCase } from "../../@core/application/pokemon/list-pokemons.use-case";
 import { container, Registry } from "../../@core/infra/container-registry";
-import { PokemonProps } from "../../@core/domain/entities/pokemon";
 import { ListRegionsUseCase } from "../../@core/application/region/list-regions.use-case";
-import { RegionProps } from "../../@core/domain/entities/region";
 import { ChangeEvent, useEffect, useState } from "react";
 import { ListDatesUseCase } from "../../@core/application/date/list-dates.use-case";
 import { ListTimesUseCase } from "../../@core/application/time/list-times.use-case";
 import { ListCitiesUseCase } from "../../@core/application/city/list-cities.use-case";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import errorImage from "../../../public/images/error.png";
-import Image from "next/image";
 import { toast } from "react-toastify";
 import { Error } from "../../components/Error";
+import { IConsultaProps } from "../../interfaces/pages";
 
-type ConsultaProps = {
-  pokemons: PokemonProps[];
-  regions: RegionProps[];
-  error: boolean;
-};
-
-function Consulta({ pokemons, regions, error }: ConsultaProps) {
+function Consulta({ pokemons, regions, error }: IConsultaProps) {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
@@ -92,6 +83,10 @@ function Consulta({ pokemons, regions, error }: ConsultaProps) {
     control,
     name: "pokemonsValues",
   });
+
+  const onSubmit: SubmitHandler<any> = (data: any) => {
+    console.log(data);
+  };
 
   // Renderização condicional do componente Error em caso de erro ao buscar dados da API
   if (error) {
@@ -159,10 +154,6 @@ function Consulta({ pokemons, regions, error }: ConsultaProps) {
     (item) =>
       item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase()
   );
-
-  const onSubmit: SubmitHandler<any> = (data: any) => {
-    console.log(data);
-  };
 
   return (
     <>
