@@ -26,6 +26,8 @@ import { IConsultaProps } from "../../interfaces/pages";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { PostScheduleUseCase } from "../../@core/application/schedule/post-schedule.use-case";
+import { Modal } from "../../components/Modal";
+import { IModal } from "../../interfaces/components";
 
 const schema = yup
   .object({
@@ -46,6 +48,16 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
+  const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [modalProps, setModalProps] = useState<IModal>({
+    title: "",
+    description: "",
+    type: "success",
+  });
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
 
   // Obtendo datas e horários disponíveis ao inicializar
   useEffect(() => {
@@ -88,7 +100,13 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
     getValues,
     watch,
     reset,
-    formState: { errors, isSubmitted, isValid, isSubmitSuccessful },
+    formState: {
+      errors,
+      isSubmitted,
+      isValid,
+      isSubmitSuccessful,
+      submitCount,
+    },
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -137,6 +155,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
     setValue("price", priceValue);
   }, [setValue, getValues, pokemonsValuesWatch]);
 
+  // Exibe notificação tipo toast caso formulário enviado não esteja válido
   useEffect(() => {
     if (!isValid && isSubmitted && !isSubmitSuccessful) {
       toast.error("Preencha todos os campos obrigatórios para o agendamento.", {
@@ -145,7 +164,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
         theme: "dark",
       });
     }
-  }, [isValid, isSubmitted, isSubmitSuccessful]);
+  }, [isValid, isSubmitted, isSubmitSuccessful, submitCount]);
 
   const priceValue: number = watch("price");
   const taxValue: number = watch("tax");
@@ -239,8 +258,11 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
         );
         reset();
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao enviar formulário:", err);
+
+      resp = err.response.data;
+
       toast.error(
         "Não foi possível concluir seu agendamento. Tente novamente.",
         {
@@ -249,11 +271,22 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
           theme: "dark",
         }
       );
+      reset();
     } finally {
       if (resp && resp.success) {
-        console.log("Sucesso ao agendar!", resp);
+        setModalOpen(true);
+        setModalProps({
+          title: "Consulta Agendada",
+          description: resp.message.toString(),
+          type: "success",
+        });
       } else {
-        console.log("Erro ao agendar!");
+        setModalOpen(true);
+        setModalProps({
+          title: "Houve um problema no agendamento",
+          description: resp.message.toString(),
+          type: "error",
+        });
       }
     }
   };
@@ -304,6 +337,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
               labelText="Cidade"
               $isSelectPokemon={false}
               options={cities}
+              placeholder="Selecione uma cidade"
               disabled={!cities.length}
               {...register("city")}
               isRequired={true}
@@ -412,6 +446,14 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
           </CheckinFormContainer>
         </FormContainer>
       </Container>
+
+      <Modal
+        title={modalProps.title}
+        description={modalProps.description}
+        type={modalProps.type}
+        $isOpen={isModalOpen}
+        onClose={closeModal}
+      />
     </>
   );
 }

@@ -35,14 +35,15 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     ) {
       return res
         .status(400)
-        .json({ success: false, error: "Tipos de dados inválidos." });
+        .json({ success: false, message: "Tipos de dados inválidos." });
     }
 
+    let message: string = `Seu agendamento para dia ${date}, às ${time}, para ${quantity} pokémon(s) foi realizado com sucesso!`;
     // Retornando o objeto com o ID gerado e a propriedade success
     const response = {
-      data: { ...req.body },
-      id,
+      data: { ...req.body, id },
       success: true,
+      message: message,
     };
 
     res.status(200).json(response);
@@ -50,6 +51,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     console.error("Erro ao agendar consulta:", error);
     res
       .status(500)
-      .json({ success: false, error: "Erro interno ao agendar consulta" });
+      .json({ success: false, message: "Erro interno ao agendar consulta." });
   }
 }

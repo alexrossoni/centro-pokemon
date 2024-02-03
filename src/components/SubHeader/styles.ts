@@ -13,7 +13,7 @@ export const SubHeaderContainer = styled.section`
   > div {
     display: flex;
     align-items: center;
-    gap: .25rem;
+    gap: 0.25rem;
 
     > p {
       font-size: 12px;
@@ -31,10 +31,10 @@ export const SubHeaderContainer = styled.section`
     font-weight: 400;
   }
 
-  /* Estilos para telas maiores que 720px de largura */
+  /* Estilos para telas menores que 720px de largura */
   @media only screen and (max-width: 720px) {
     height: 9rem;
-    padding: .5rem 2rem;
+    padding: 0.5rem 2rem;
 
     > div {
       > p {

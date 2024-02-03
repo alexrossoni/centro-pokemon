@@ -38,3 +38,11 @@ export interface IButtonAddPokemon {
 export interface IError {
   error: boolean;
 }
+
+export interface IModal {
+  title: string;
+  description: string;
+  $isOpen?: boolean;
+  type: "success" | "error";
+  onClose?: any;
+}
