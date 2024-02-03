@@ -50,11 +50,10 @@ export const ContentContainer = styled.div`
     color: var(--gray-100);
   }
 
-  > .btn-close-modal {
+  > .btn-home-modal {
     position: absolute;
     right: 10px;
     top: 10px;
-    font-weight: 700;
     color: var(--gray-100);
     cursor: pointer;
   }

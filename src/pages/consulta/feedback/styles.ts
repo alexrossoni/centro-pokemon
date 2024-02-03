@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 export const Container = styled.div`
   width: 100%;
@@ -7,13 +7,5 @@ export const Container = styled.div`
   flex: 1;
   align-items: center;
   background: var(--white);
-
-  > .imageErrorContainer {
-    width: 100%;
-    max-height: 400px;
-    max-width: 600px;
-    aspect-ratio: 600/400;
-    margin-top: 2rem;
-    position: relative;
-  }
+  justify-content: space-between;
 `;

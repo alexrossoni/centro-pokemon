@@ -5,6 +5,8 @@ import Head from "next/head";
 import { SubHeader } from "../../../components/SubHeader";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import waveImage from "../../../../public/images/wave.svg";
+import Image from "next/image";
 
 function Feedback() {
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
@@ -43,6 +45,13 @@ function Feedback() {
           description="Recupere seus pokémons em 5 segundos."
           page="Agendar Consulta"
         />
+
+        <Image
+          src={waveImage}
+          alt="Imagem de animação estilo ondas"
+          layout="responsive"
+        />
+
         <Modal
           title={modalProps.title}
           description={modalProps.description}
