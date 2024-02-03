@@ -1,6 +1,7 @@
 export type PokemonProps = {
   name: string;
-  url: string;
+  url?: string;
+  generation?: number;
 };
 
 export class Pokemon {
@@ -14,10 +15,23 @@ export class Pokemon {
     return this.props.url;
   }
 
+  get generation() {
+    return this.props.generation;
+  }
+
   toJSON() {
-    return {
+    const json: PokemonProps = {
       name: this.name,
-      url: this.url,
     };
+
+    if (this.url !== undefined) {
+      json.url = this.url;
+    }
+
+    if (this.generation !== undefined) {
+      json.generation = this.generation;
+    }
+
+    return json;
   }
 }

@@ -5,16 +5,34 @@ import { PokemonGateway } from "../../domain/gateways/pokemon.gateway";
 export class PokemonHttpGateway implements PokemonGateway {
   constructor(private http: AxiosInstance) {}
 
+  // Responsável por carregar os dados de cada pokémon junto a sua geração
+  async fetchPokemonData(pokemonName: string): Promise<Pokemon> {
+    return this.http
+      .get(`/pokemon-species/${pokemonName}`)
+      .then((pokemonData) => {
+        // Obtendo a geração do pokémon atravpes da URL da geração
+        const generation = pokemonData.data.generation.url
+          .split("generation/")[1]
+          .replaceAll("/", "");
+
+        return new Pokemon({
+          name: pokemonData.data.name,
+          generation: parseInt(generation),
+        });
+      });
+  }
+
   async findAll(): Promise<Pokemon[]> {
-    return this.http.get<any>("/pokemon?limit=50&offset=0").then((res) => {
-      return res.data.results.map(
-        (data: any) =>
-          new Pokemon({
-            name: data.name,
-            url: data.url,
-          })
-      );
+    const response = await this.http.get("/pokemon?limit=50&offset=0");
+    const pokemonList = response.data.results;
+
+    const pokemonDataPromises = pokemonList.map((pokemon: Pokemon) => {
+      return this.fetchPokemonData(pokemon.name);
     });
+
+    const pokemonData = await Promise.all(pokemonDataPromises);
+
+    return pokemonData;
   }
 
   async findByName(name: string): Promise<Pokemon> {

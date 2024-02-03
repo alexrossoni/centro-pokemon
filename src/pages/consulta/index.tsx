@@ -48,7 +48,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
 
-  // Obtendo datas e horários disponíveis ao inicializar
+  // Responsável por obter as datas e horários disponíveis ao inicializar
   useEffect(() => {
     const useCaseListDates = container.get<ListDatesUseCase>(
       Registry.ListDatesUseCase
@@ -103,7 +103,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
       surname: "",
       region: "",
       city: "",
-      pokemonsValues: [{ name: "Bulbasaur" }],
+      pokemonsValues: [{ name: "Bulbasaur", generation: 1 }],
       date: "",
       time: "",
       quantity: 1,
@@ -125,6 +125,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
 
   const pokemonsValuesWatch = watch("pokemonsValues");
 
+  // Responsável por atualizar os valores da sessão de chack-out do formulário
   useEffect(() => {
     const values = getValues();
 
@@ -134,8 +135,10 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
     const subTotal = quantityValue * 70;
     const maxTaxValue = subTotal * 0.3;
 
-    // const highestGen = Math.max(...values.pokemonsValues.map((pokemon) => pokemon.gen));
-    const highestGen = 1;
+    const highestGen = Math.max(
+      ...values.pokemonsValues.map((pokemon) => pokemon.generation)
+    );
+
     // Garante que taxValue não ultrapasse 30% do subTotal
     const taxValue = Math.min(subTotal * 0.03 * highestGen, maxTaxValue);
     setValue("tax", taxValue);
@@ -217,9 +220,12 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
     return formattedName;
   };
 
-  const pokemonsNames: { name: string }[] = pokemons.map(({ name }) => ({
-    name: name.charAt(0).toUpperCase() + name.slice(1).toLowerCase(),
-  }));
+  const pokemonsNames: { name: string; generation: number }[] = pokemons.map(
+    ({ name, generation }) => ({
+      name: name.charAt(0).toUpperCase() + name.slice(1).toLowerCase(),
+      generation: generation as number,
+    })
+  );
 
   const regionsNames: string[] = regions.map(
     (item) =>

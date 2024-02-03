@@ -27,6 +27,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       typeof city !== "string" ||
       !Array.isArray(pokemonsValues) ||
       !pokemonsValues.every((pokemon) => typeof pokemon.name === "string") ||
+      !pokemonsValues.every(
+        (pokemon) => typeof pokemon.generation === "number"
+      ) ||
       typeof date !== "string" ||
       typeof time !== "string" ||
       typeof quantity !== "number" ||
