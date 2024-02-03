@@ -26,8 +26,7 @@ import { IConsultaProps } from "../../interfaces/pages";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { PostScheduleUseCase } from "../../@core/application/schedule/post-schedule.use-case";
-import { Modal } from "../../components/Modal";
-import { IModal } from "../../interfaces/components";
+import Router from "next/router";
 
 const schema = yup
   .object({
@@ -48,16 +47,6 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
-  const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const [modalProps, setModalProps] = useState<IModal>({
-    title: "",
-    description: "",
-    type: "success",
-  });
-
-  const closeModal = () => {
-    setModalOpen(false);
-  };
 
   // Obtendo datas e horários disponíveis ao inicializar
   useEffect(() => {
@@ -130,7 +119,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
 
   const onSubmit: SubmitHandler<any> = (data: any) => {
     if (isValid) {
-      postConsulta(data);
+      processSubmitForm(data);
     }
   };
 
@@ -237,57 +226,41 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
       item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase()
   );
 
-  const postConsulta = async (formData: object) => {
+  const processSubmitForm = async (formData: object) => {
     let resp: any;
 
     try {
-      const useCasePostAgendamento = container.get<PostScheduleUseCase>(
+      const useCasePostSchedule = container.get<PostScheduleUseCase>(
         Registry.PostScheduleUseCase
       );
 
-      resp = await useCasePostAgendamento.execute(formData);
+      resp = await useCasePostSchedule.execute(formData);
 
       if (resp.success) {
-        toast.success(
-          "Seu agendamento foi conclúido. Agradecemos sua preferência!",
-          {
-            toastId: "success-submit-form",
-            position: "top-right",
-            theme: "dark",
-          }
-        );
-        reset();
+        Router.push({
+          pathname: "/consulta/feedback",
+          query: {
+            status: "success",
+            title: "Consulta Agendada",
+            description: resp.message.toString(),
+          },
+        });
       }
     } catch (err: any) {
       console.error("Erro ao enviar formulário:", err);
 
       resp = err.response.data;
 
-      toast.error(
-        "Não foi possível concluir seu agendamento. Tente novamente.",
-        {
-          toastId: "error-submit-form",
-          position: "top-right",
-          theme: "dark",
-        }
-      );
-      reset();
-    } finally {
-      if (resp && resp.success) {
-        setModalOpen(true);
-        setModalProps({
-          title: "Consulta Agendada",
-          description: resp.message.toString(),
-          type: "success",
-        });
-      } else {
-        setModalOpen(true);
-        setModalProps({
+      Router.push({
+        pathname: "/consulta/feedback",
+        query: {
+          status: "error",
           title: "Houve um problema no agendamento",
           description: resp.message.toString(),
-          type: "error",
-        });
-      }
+        },
+      });
+    } finally {
+      reset();
     }
   };
 
@@ -366,7 +339,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
               disabled={fields.length == 6}
               onClick={() => {
                 event?.preventDefault();
-                append({ name: "Bulbasaur" });
+                append(control._defaultValues.pokemonsValues); // Inicia o select com o valor default definido
               }}
             >
               Adicionar novo pokémon ao time...
@@ -446,14 +419,6 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
           </CheckinFormContainer>
         </FormContainer>
       </Container>
-
-      <Modal
-        title={modalProps.title}
-        description={modalProps.description}
-        type={modalProps.type}
-        $isOpen={isModalOpen}
-        onClose={closeModal}
-      />
     </>
   );
 }

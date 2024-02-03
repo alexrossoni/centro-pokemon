@@ -43,6 +43,6 @@ export interface IModal {
   title: string;
   description: string;
   $isOpen?: boolean;
-  type: "success" | "error";
+  status: "success" | "error";
   onClose?: any;
 }

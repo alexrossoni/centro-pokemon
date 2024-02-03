@@ -5,11 +5,12 @@ import checkIcon from "../../../public/check.svg";
 import warnIcon from "../../../public/warning.svg";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import Router from "next/router";
 
 export const Modal = ({
   title,
   description,
-  type,
+  status,
   $isOpen,
   onClose,
 }: IModal) => {
@@ -44,7 +45,7 @@ export const Modal = ({
           X
         </span>
         <h1>{title}</h1>
-        {type == "success" ? (
+        {status == "success" ? (
           <Image
             className="icon"
             src={checkIcon}
@@ -58,7 +59,13 @@ export const Modal = ({
           />
         )}
         <p className="description">{description}</p>
-        <Button onClick={onClose}>Fazer Novo Agendamento</Button>
+        <Button
+          onClick={() => {
+            Router.push("/consulta");
+          }}
+        >
+          Fazer Novo Agendamento
+        </Button>
       </ContentContainer>
     </Container>
   );
