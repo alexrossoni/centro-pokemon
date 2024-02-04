@@ -47,7 +47,7 @@ pnpm run dev
 
 ## O que foi feito?
 
-Uuma aplicação web em Typescript com Next.js. Com interface totalmente responsiva, e atendendo aos requisitos e ao design predefinido, aplicando os princípios da Clean Architecture no Front-end.
+Uma aplicação web em Typescript com Next.js. Com interface totalmente responsiva, e atendendo aos requisitos e ao design predefinido, aplicando os princípios da Clean Architecture no Front-end.
 
 ### Requisitos
 
