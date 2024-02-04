@@ -37,9 +37,6 @@ export const ContentContainer = styled.div`
 
   > .icon {
     width: auto;
-    max-height: 400px;
-    max-width: 600px;
-    aspect-ratio: 600/400;
     position: relative;
   }
 

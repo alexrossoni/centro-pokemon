@@ -27,6 +27,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { PostScheduleUseCase } from "../../@core/application/schedule/post-schedule.use-case";
 import Router from "next/router";
+import formatCityName from "../../utils/city-name-formatter";
+import formatPokemonsOptions from "../../utils/pokemons-options-formatter";
+import formatRegionsOptions from "../../utils/regions-options-formatter";
+import { PokemonProps } from "../../@core/domain/entities/pokemon";
 
 const schema = yup
   .object({
@@ -47,6 +51,10 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
+  const [pokemonsOptions, setPokemonsOptions] = useState<PokemonProps[] | []>(
+    []
+  );
+  const [regionsOptions, setRegionsOptions] = useState<string[]>([]);
 
   // Responsável por obter as datas e horários disponíveis ao inicializar
   useEffect(() => {
@@ -162,6 +170,14 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
   const taxValue: number = watch("tax");
   const quantityValue: number = watch("quantity");
 
+  useEffect(() => {
+    const formatedPokemonsOptions = formatPokemonsOptions(pokemons);
+    setPokemonsOptions(formatedPokemonsOptions);
+
+    const formatedRegionsOptions = formatRegionsOptions(regions);
+    setRegionsOptions(formatedRegionsOptions);
+  }, [pokemons, regions]);
+
   // Renderização condicional do componente Error em caso de erro ao buscar dados da API
   if (fetchDataError) {
     return <Error error={fetchDataError} />;
@@ -211,26 +227,6 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
 
     setCities(uniqueCitiesArray);
   };
-
-  // Função para formatar o nome das cidades
-  const formatCityName = (cityName: string): string => {
-    const formattedName = cityName
-      .replaceAll("-", " ")
-      .replace(/\b\w/g, (l) => l.toUpperCase());
-    return formattedName;
-  };
-
-  const pokemonsNames: { name: string; generation: number }[] = pokemons.map(
-    ({ name, generation }) => ({
-      name: name.charAt(0).toUpperCase() + name.slice(1).toLowerCase(),
-      generation: generation as number,
-    })
-  );
-
-  const regionsNames: string[] = regions.map(
-    (item) =>
-      item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase()
-  );
 
   const processSubmitForm = async (formData: object) => {
     let resp: any;
@@ -305,7 +301,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
               idSelect="region"
               labelText="Região"
               $isSelectPokemon={false}
-              options={regionsNames}
+              options={regionsOptions}
               placeholder="Selecione uma região"
               {...register("region")}
               onChange={handleRegionChange}
@@ -332,7 +328,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
                 <Select
                   labelText={`Pokémon ${index + 1}`}
                   $isSelectPokemon={true}
-                  options={pokemonsNames}
+                  options={pokemonsOptions}
                   {...register(`pokemonsValues.${index}.name`)}
                   key={field.id}
                   isRequired={index == 0}

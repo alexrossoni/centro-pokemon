@@ -49,7 +49,7 @@ function Feedback() {
         <Image
           src={waveImage}
           alt="Imagem de animação estilo ondas"
-          layout="responsive"
+          style={{ width: "100%", height: "auto" }}
         />
 
         <Modal
