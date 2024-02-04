@@ -107,7 +107,7 @@ export const ButtonRemoveSelect = styled.button`
   border-radius: 50%;
 `;
 
-export const CheckinFormContainer = styled.div`
+export const CheckoutFormContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -142,7 +142,18 @@ export const CheckinFormContainer = styled.div`
   }
 
   /* Estilos para telas menores que 720px de largura */
-  /* @media only screen and (max-width: 720px) {
-    flex-direction: column;
-  } */
+  @media only screen and (max-width: 720px) {
+    font-size: 10px;
+
+    > section {
+      flex-direction: column;
+      gap: 0.75rem;
+
+      > span {
+        font-size: 20px;
+        color: var(--black);
+        font-weight: 600;
+      }
+    }
+  }
 `;

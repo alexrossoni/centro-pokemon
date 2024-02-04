@@ -3,7 +3,7 @@ import {
   FormContainer,
   InputsContainer,
   RegisterYourTeamContainer,
-  CheckinFormContainer,
+  CheckoutFormContainer,
 } from "../../styles/consulta-styles";
 import { SubHeader } from "../../components/SubHeader";
 import Head from "next/head";
@@ -372,7 +372,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
             />
           </InputsContainer>
           <hr />
-          <CheckinFormContainer>
+          <CheckoutFormContainer>
             <div>
               <span>Número de pokémons a serem atendidos:</span>
               <span>{quantityValue}</span>
@@ -419,7 +419,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
                 Concluir Agendamento
               </Button>
             </section>
-          </CheckinFormContainer>
+          </CheckoutFormContainer>
         </FormContainer>
       </Container>
     </>
