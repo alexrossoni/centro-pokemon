@@ -4,6 +4,14 @@ Desafio para desenvolvimento Front-end – React/Next.js. | codie.digital
 
 ---
 
+## Entrega
+
+O prazo para entrega é de 07 dias.
+🗓️ Início: 29/02
+✅ Entregue: 04/02
+
+---
+
 ## Ferramentas utilizadas
 
 - TypeScript
@@ -39,7 +47,7 @@ pnpm run dev
 
 ## O que foi feito?
 
-Uma aplicação web em Typescript com Next.js, implementando os requisitos e o design predefinido aplicando os conceitos de Clean Architecture no Front-end.
+Uuma aplicação web em Typescript com Next.js. Com interface totalmente responsiva, e atendendo aos requisitos e ao design predefinido, aplicando os princípios da Clean Architecture no Front-end.
 
 ### Requisitos
 
