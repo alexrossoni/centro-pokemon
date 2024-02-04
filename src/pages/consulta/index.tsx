@@ -245,6 +245,7 @@ function Consulta({ pokemons, regions, fetchDataError }: IConsultaProps) {
             status: "success",
             title: "Consulta Agendada",
             description: resp.message.toString(),
+            id: resp.data.id,
           },
         });
       }

@@ -45,4 +45,5 @@ export interface IModal {
   $isOpen?: boolean;
   status: "success" | "error";
   onClose?: any;
+  id?: number;
 }

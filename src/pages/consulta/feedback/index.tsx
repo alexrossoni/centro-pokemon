@@ -16,24 +16,29 @@ function Feedback() {
     status: "success",
   });
   const router = useRouter();
-  const { status, title, description } = router.query as {
+  const { status, title, description, id } = router.query as {
     status: "success" | "error";
     title: string;
     description: string;
+    id: string;
   };
 
   useEffect(() => {
-    setModalOpen(true);
-    setModalProps({
-      title: title,
-      description: description,
-      status: status,
-    });
-  }, [status, title, description]);
-
-  const closeModal = () => {
-    setModalOpen(false);
-  };
+    if (
+      ((status === "success" && id) || status === "error") &&
+      title &&
+      description
+    ) {
+      setModalOpen(true);
+      setModalProps({
+        title: title,
+        description: description,
+        status: status,
+      });
+    } else {
+      router.push("/");
+    }
+  }, [status, title, description, id, router]);
 
   return (
     <>
@@ -57,7 +62,6 @@ function Feedback() {
           description={modalProps.description}
           status={modalProps.status}
           $isOpen={isModalOpen}
-          onClose={closeModal}
         />
       </Container>
     </>
