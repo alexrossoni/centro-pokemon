@@ -4,7 +4,7 @@ import {
   InputsContainer,
   RegisterYourTeamContainer,
   CheckinFormContainer,
-} from "./styles";
+} from "../../styles/consulta-styles";
 import { SubHeader } from "../../components/SubHeader";
 import Head from "next/head";
 import { Input } from "../../components/Input";

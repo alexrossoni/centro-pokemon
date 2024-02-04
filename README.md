@@ -65,11 +65,13 @@ Uma aplicação web em Typescript com Next.js, implementando os requisitos e o d
 ### Uso de APIs
 
 #### Originais do projeto
+
 - `http://localhost:3000/api/scheduling/date` para obter as datas disponíveis para agendamento
 - `htttp://localhost:3000/api/scheduling/time` para obter os horários disponíveis para agendamento
 - [pokéAPI](https://pokeapi.co/) para obter os dados de região, cidades, e pokémons a serem usados no agendamento
-- 
+
 #### Criado por mim
+
 - `htttp://localhost:3000/api/scheduling/schedule` foi criado para lidar com o envio do formulário de agendamento de consulta
 
 ---
@@ -113,4 +115,3 @@ Obs: O logo segue o seguinte comportamento: inicia expandido na home, e reduz ap
 ### Caso de erro ao obter dados da PokéAPI
 
 ![image](https://github.com/alexrossoni/centro-pokemon/assets/103969200/0009b157-ebe6-42d3-b47d-3faad59ed2c4)
-

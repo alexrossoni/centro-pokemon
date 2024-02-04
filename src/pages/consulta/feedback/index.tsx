@@ -1,4 +1,4 @@
-import { Container } from "./styles";
+import { Container } from "../../../styles/feedback-styles";
 import { Modal } from "../../../components/Modal";
 import { IModal } from "../../../interfaces/components";
 import Head from "next/head";
